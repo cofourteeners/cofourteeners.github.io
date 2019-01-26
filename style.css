@@ -1,0 +1,51 @@
+HTML,
+BODY {
+  height: 100%;
+  background-color: #333;
+}
+
+body {
+  color: #FFF;
+  text-align: center;
+  font-family: "Palatino", "Garamond", "Helvetica"; 
+}
+
+
+/*TEXT*/
+.center {
+  text-align: center;
+}
+/*Headings*/
+div > h1 {
+  font-size: 42px;
+}
+div > h2 {
+  font-size: 36px;
+}
+/*Hyperlinks*/
+a,
+a:hover {
+  color: #CCC;
+}
+
+/*HEADER*/
+
+
+/*BODY*/
+.main {
+  background: #FFF;
+  padding: 15%; /*80px*/
+}
+/*index.html */
+.cover-inner {
+  padding: 25%;
+}
+
+/* FOOTER */
+footer {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+footer p {
+  margin-bottom: .25rem;
+}
