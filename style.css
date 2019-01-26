@@ -40,6 +40,11 @@ a:hover {
 .cover-inner {
   padding: 25%;
 }
+.coverPage {
+  background: url("/images/coverPhoto.jpg") no-repeat fixed center;
+  background-size: cover;
+  height: 100%;
+}
 
 /* FOOTER */
 footer {
