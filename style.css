@@ -41,7 +41,7 @@ a:hover {
   padding: 25%;
 }
 .coverPage {
-  background: url("/images/coverPhoto.jpg") no-repeat fixed center;
+  background: url("/images/coverPhoto.jpg");
   background-size: cover;
   background-position: center;
   height: 100%;
