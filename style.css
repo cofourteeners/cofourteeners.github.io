@@ -43,7 +43,9 @@ a:hover {
 .coverPage {
   background: url("/images/coverPhoto.jpg") no-repeat fixed center;
   background-size: cover;
+  background-position: center;
   height: 100%;
+  position: relative;
 }
 
 /* FOOTER */
