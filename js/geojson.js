@@ -141,8 +141,8 @@ function createStandardSymbols(data, map, attrs) {
   L.geoJson(data, {
     pointToLayer: function (feature, latlng) {
       options = {icon: trailheadIcon};
-//      return L.marker(latlng, options);
-      return pointToLayer(feature, latlng, attrs);
+      return L.marker(latlng, options);
+      //return pointToLayer(feature, latlng, attrs);
     }
   }).addTo(map);
 }
