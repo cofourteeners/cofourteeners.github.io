@@ -23,7 +23,7 @@ var peakIcon = L.icon({
   iconUrl: "images/mountain-15.svg",
   iconSize:     [20, 20],
   iconAnchor:   [10, 10],
-  popupAnchor:  [0, -180]
+  popupAnchor:  [0, -220]
 });
 var trailheadIcon = L.icon({
   iconUrl: "images/parking-15.svg",
@@ -46,6 +46,8 @@ function pointToLayer(feature, latlng, attrs){
   var attr = attrs[0];
   var peakElevation = feature.properties["Elevation"];
   var peakName = feature.properties["Name"];
+  var peakRoutes = feature.properties["Routes"];
+  var peakDifficulty = feature.properties["Difficulty"];
   var peakIsolation = feature.properties["Isolation"];
   var peakLabel = feature.properties["Label"];
   var peakPopularity = feature.properties["Popularity"];
@@ -83,7 +85,9 @@ function pointToLayer(feature, latlng, attrs){
     // Peak Label
     "<p><b>" + peakRange + "</b><br>" +
     "<b>" + peakRank + ".</b> " + peakLabel + "</p>" +
-    "<p><b>Elevation:</b> " + peakElevation + "' <br>" +
+    "<p><b>Average difficulty:</b> " + peakDifficulty + " out of 5<br>" +
+    "<b># of routes:</b> " + peakRoutes + "<br>" +
+    "<b>Elevation:</b> " + peakElevation + "' <br>" +
     "<b>Visitors:</b> " + peakPopularity + " per year <br>" +
     "<b>Isolation:</b> " + peakIsolation + " miles <br>" +
     "<b>Prominence:</b> " + peakProminence + "'</p>"
