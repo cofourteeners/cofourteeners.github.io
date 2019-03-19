@@ -23,26 +23,21 @@ var peakIcon = L.icon({
   iconUrl: "images/mountain-15.svg",
   iconSize:     [20, 20],
   iconAnchor:   [10, 10],
-  popupAnchor:  [0, -220]
+  popupAnchor:  [0, -210]
 });
 var trailheadIcon = L.icon({
   iconUrl: "images/parking-15.svg",
   iconSize:     [10, 10],
   iconAnchor:   [5, 5],
-  popupAnchor:  [0, -180]
+  popupAnchor:  [0, -150]
+});
+var routeIcon = L.icon({
+  popupAnchor:  [0, -150]
 });
 
-// Calculate proportional symbol radius
-function calcPropRadius(propValue) {
-  var scaleFactor = 35;
-  var area = propValue * scaleFactor;
-  var radius = Math.sqrt(area/Math.PI);
-  return radius;
-}
 
-// Popup & Panel
 function pointToLayer(feature, latlng, attrs){
-  // Define "peak" attributes
+  // Peak Variables
   var attr = attrs[0];
   var peakElevation = feature.properties["Elevation"];
   var peakName = feature.properties["Name"];
@@ -54,112 +49,112 @@ function pointToLayer(feature, latlng, attrs){
   var peakProminence = feature.properties["Prominence"];
   var peakRange = feature.properties["Range"];
   var peakRank = feature.properties["Rank"];
-  // Define "trailhead" attributes
-  var trailheadName = feature.properties["Name"];
-  // Define "route" attributes
-  var routeName = feature.properties["Name"];
-  var routeClass = feature.properties["Class"];
-  var routeClass2 = feature.properties["Qualifier"];
-  var routeLabel = feature.properties["Label"];
-  var routeElevGain = feature.properties["ElevGain"];
-  var routeDistRT = feature.properties["DistRT"];
-  var routeExposure = feature.properties["Exposure"];
-  var routePeaks = feature.properties["Peaks"];
-  
-  // Define radius attribute 
-  /*var propValue = Number(peakRank);*/
-  // Define symbology
-  /*var options = {
-    weight: 1.5,
-    opacity: 1,
-    color: "#FFF",
-    dashArray: "2",
-    fillOpacity: 0.5
-  };*/
-//  options.radius = calcPropRadius(propValue);
-//  options.fillColor = getColor(propValue);
-  
+
   var layer = L.marker(latlng, options);
   
+  // Peak Label
   var popupContent = 
-    // Peak Label
     "<p><b>" + peakRange + "</b><br>" +
     "<b>" + peakRank + ".</b> " + peakLabel + "</p>" +
     "<p><b>Average difficulty:</b> " + peakDifficulty + " out of 5<br>" +
     "<b># of routes:</b> " + peakRoutes + "<br>" +
-    "<b>Elevation:</b> " + peakElevation + "' <br>" +
-    "<b>Visitors:</b> " + peakPopularity + " per year <br>" +
-    "<b>Isolation:</b> " + peakIsolation + " miles <br>" +
-    "<b>Prominence:</b> " + peakProminence + "'</p>"
-    // Route Label
-    /*"<p><b>" + routeName + "</b><br>" +
-    "<b>" + "Class" + ":</b> " + routeClass + routeClass2 + "</p>" +
-    "<p><b>Elevation Gain:</b> " + routeElevGain + "'<br>" +
-    "<b>Distance:</b> " + routeDistRT + " miles<br>" +
-    "<b>Exposure:</b> " + routeExposure + "<br>" +
-    "<b>Peaks:</b> " + routePeaks + "</p>"*/
-  ;
-
-  var panelContent = 
-    // Rank Label
-    "<p><b>" + peakRank + ". </b>" +
-    // Peak Label
-    "<b>" + peakName + "</b></p>" +
-    // Elevation Label
-    "<p><b>Elevation: </b>" + peakElevation + "'</p>" + 
-    // Range Label
-    "<p><b>Locale: </b>" + peakRange
-    "</p><br>"
+    "<b>Elevation:</b> " + peakElevation.toLocaleString() + "' <br>" +
+    "<b>Visitors:</b> " + peakPopularity/*.toLocaleString()*/ + " per year <br>" +
+    "<b>Isolation:</b> " + peakIsolation/*.toFixed(2)*/ + " miles <br>" +
+    "<b>Prominence:</b> " + peakProminence/*.toLocaleString()*/ + "'</p>"
   ;
   
   // Event listeners 
   layer.on({
-    mouseover: function() {
+    mouseclick: function() {
       this.openPopup();
     },
-    mouseout: function() {
+    mouseclick: function() {
       this.closePopup();
-    },
-    click: function() {
-      $("#panel").html(panelContent);
     }
   });
   layer.bindPopup(popupContent, {
-    offset: new L.Point(0, -options.radius),
+    offset: new L.Point(0),
     closeButton: false
   });
   return layer;
 };
 
-// Create proportional symbols
-function createPropSymbols(data, map, attrs) {
-  L.geoJson(data, {
+
+// Create peak symbols
+function createPeakSymbols(data, map, attrs) {
+  L.geoJSON(data, {
     pointToLayer: function(feature, latlng) {
       options = {icon: peakIcon};
       return pointToLayer(feature, latlng, attrs);
     }
   }).addTo(map);
 };
-// Create standard symbol
-function createStandardSymbols(data, map, attrs) {
-  L.geoJson(data, {
+// Create trailhead symbol
+function createTrailheadSymbols(data, map, attrs) {
+  L.geoJSON(data, {
     pointToLayer: function (feature, latlng) {
       options = {icon: trailheadIcon};
-      return L.marker(latlng, options);
-      //return pointToLayer(feature, latlng, attrs);
+      return pointToLayer(feature, latlng, attrs);
+    },
+    onEachFeature: function(feature, layer) {
+      // Trailhead Variables
+      var trailheadName = feature.properties["Name"];
+      var trailheadElev = feature.properties["Elevation"];
+      var trailheadLabel = feature.properties["Label"];
+      var trailheadRange = feature.properties["Range"];
+      var trailheadDiff = feature.properties["Difficulty"];
+      var trailheadPeaks = feature.properties["Peaks"];
+      
+      // Trailhead Label
+      var popupContent = 
+        "<p><b>" + trailheadLabel + "</b><br>" +
+        "<b>" + "Road Difficulty" + ":</b> " + trailheadDiff + " out of 6</p>" +
+//        "<p><b>Elevation</b> " + trailheadElev + "'<br>" +
+        "<b>Range:</b> " + trailheadRange + "<br>" +
+        "<b>Peak(s):</b> " + trailheadPeaks + "</p>"
+      ; 
+        
+      layer.bindPopup(popupContent);
     }
   }).addTo(map);
 }
-// Create line symbol
-function createLineSymbols(data, map) {
-  L.geoJSON(data, {
-    style: function(feature) {
-      switch (feature.properties.class) {
-        case 1:   return {color: "#2166AC"};
-        case 2:   return {color: "#67A9CF"};
-        case 3:   return {color: "#EF8A62"};
-        case 4:   return {color: "#B2182B"};
-      }
+// Create route symbol
+function createLineSymbols(data, map, attrs) {
+  route = L.geoJSON(data, {
+    style: {
+      color: "#2166AC",
+      opacity: 0.5,
+      weight: 5
+    },
+    
+    onEachFeature: function(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight
+      })
+      
+      // Route Variables
+      var routeName = feature.properties["Name"];
+      var routeClass = feature.properties["Class"];
+      var routeClass2 = feature.properties["Qualifier"];
+      var routeLabel = feature.properties["Label"];
+      var routeElevGain = feature.properties["ElevGain"];
+      var routeDistRT = feature.properties["DistRT"];
+      var routeExposure = feature.properties["Exposure"];
+      var routePeaks = feature.properties["Peaks"];
+      
+      // Route Label
+      var popupContent = 
+        "<p><b>" + routeLabel + "</b><br>" +
+        "<b>" + "Class" + ":</b> " + routeClass + routeClass2 + "</p>" +
+        "<p><b>Elevation Gain:</b> " + routeElevGain + "'<br>" +
+        "<b>Distance:</b> " + routeDistRT + " miles RT<br>" +
+        "<b>Exposure:</b> " + routeExposure + "<br>" +
+        "<b>Peak(s):</b> " + routePeaks + "</p>"
+      ;
+      layer.bindPopup(popupContent);
+      
     }
   }).addTo(map);
 }
@@ -168,41 +163,40 @@ function createLineSymbols(data, map) {
 function processData(data) {
   var attrs = [];
   var properties = data.features[0].properties;
-  //console.log(properties);
+//  console.log(properties);
   for (var attr in properties){
     if (attr.indexOf("rank") > -1){
       attrs.push(attr);
     };
   };
 
-  console.log(attrs);
+//  console.log(attrs);
   return attrs;
 };
 // Call GeoJSON data w/ functions
 function getDataSC(map){
   $.ajax("data/peaks.geojson", {
-    dataType: "json",
+    dataType: "JSON",
     success: function(response){
       // Create array 
       var attrs = processData(response);
       
-      createPropSymbols(response, map, attrs);
-      createSequenceControls(map, attrs);
+      createPeakSymbols(response, map, attrs);
       filterRange(map, attrs);
     }
   });
   $.ajax("data/trailheads.geojson", {
-    dataType: "json",
+    dataType: "JSON",
     success: function(response){
       // Create array 
       var attrs = processData(response);
       
-      createStandardSymbols(response, map, attrs);
+      createTrailheadSymbols(response, map, attrs);
       filterRange(map, attrs);
     }
   });
   $.ajax("data/routes.geojson", {
-    dataType: "json",
+    dataType: "JSON",
     success: function(response){
       // Create array 
       var attrs = processData(response);
@@ -213,18 +207,6 @@ function getDataSC(map){
   });
 };
 
-
-
-// Choropleth
-function getColor(val) {
-  return  val > 55 ? "#B2182B":
-          val > 50 ? "#EF8A62":
-          val > 40 ? "#FDDBC7":
-          val > 30 ? "#D1E5F0":
-          val > 20 ? "#67A9CF":
-          val > 10 ? "#2166AC":
-                     "#F7F7F7";
-};
 
 // Mountain Range Filter
 function filterRange(map, attr) {
@@ -298,5 +280,20 @@ function createLegend(feature, map) {
   }
 };
 */
+
+function highlightFeature(e) {
+  var layer = e.target;
+  
+  layer.setStyle({
+    weight: 15,
+    color: "#B2182B",
+    fillOpacity: 0.5
+  });
+}
+function resetHighlight(e) {
+  var layer = e.target;
+  
+  route.resetStyle(layer);
+}
 
 $(document).ready(createMap);
