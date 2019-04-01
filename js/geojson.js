@@ -1,34 +1,55 @@
 //// Map & Tilelayers
 function createMap() {
   // Add tile layers
-  var basemap = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-    attribution: "ESRI"
+  var basemap = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "ESRI"
   });
-  var terrain = L.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}{r}.{ext}", {
-	ext: "png",
-    attribution: "Stamen Design"
+  var terrain = L.tileLayer(
+    "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}{r}.{ext}", {
+      ext: "png",
+      attribution: "Stamen Design"
   });
-  var imagery = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-    attribution: "ESRI"
+  var imagery = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "ESRI"
   });
-  /*var weather = L.tileLayer.wms("https://tile.openweathermap.org/map/{precipitation_new}/{12}/{41}/{-41}.png?appid={e459bbdf337bbb0f3009fd77f3a2ab6a}");*/
-  var weather = L.tileLayer.wms("http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", {
-    layers: "nexrad-n0r-900913",
-    format: "image/png",
-    transparent: true,
-    attribution: ", IEM Nexrad"
+  /*var weather = L.tileLayer.wms(
+    "https://tile.openweathermap.org/map/{precipitation_new}/{7}/{39}/{-106}.png?appid={e459bbdf337bbb0f3009fd77f3a2ab6a}", {
+      attribution: "OWM"
+  });*/
+  var weather = L.tileLayer.wms(
+    "http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", {
+      layers: "nexrad-n0r-900913",
+      format: "image/png",
+      transparent: true,
+      opacity: 0.7,
+      attribution: "IEM Nexrad"
   });
+  /*var weather = L.tileLayer.wms(
+    "https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WMSServer", {
+      layers: "1",
+      format: "image/png",
+      transparent: true,
+      opacity: 0.8,
+      attribution: "nowCOAST"
+  });*/
   
   
   // Add group layers
-//  var layers = L.layerGroup([peaks, trailheads, routes]);
+  layers = L.layerGroup();
   
   // Define map
   var map = L.map("map", {
     center: [39, -106],
+    zoomDelta: 0.25,
+    zoomSnap: 0.25,
     zoom: 7,
-    layers: [basemap, weather]
+    layers: [basemap, layers, weather]
   });
+  map.createPane("labels");
+  map.getPane("labels").style.zIndex = 650;
+  map.getPane("labels").style.pointerEvents = "none";
   
   // Set up controls
   var baseMaps = {
@@ -37,11 +58,30 @@ function createMap() {
     "Imagery": imagery
   };
   var overlayMaps = {
-//    "Layers": layers
+    "Layers": layers,
     "Weather": weather
   };
   L.control.layers(baseMaps, overlayMaps).addTo(map);
   
+  // Marker cluster
+  markerClusters = L.markerClusterGroup({
+    disableClusteringAtZoom: 10,
+    maxClusterRadius: 70,
+    removeOutsideVisibleBounds: true,
+    spiderfyOnMaxZoom: false
+  });
+  markerClusters2 = L.markerClusterGroup({
+    disableClusteringAtZoom: 10,
+    maxClusterRadius: 70,
+    showCoverageOnHover: false,
+    spiderfyOnMaxZoom: false,
+    zoomToBoundsOnClick: false
+  });
+  
+//  markerSubGroup = L.featureGroup.subGroup(markerClusters, layers);
+  
+  map.addLayer(markerClusters);
+//  map.addLayer(markerSubGroup); 
 
   // Call data on map
   getDataSC(map);
@@ -65,6 +105,7 @@ var trailheadIcon = L.icon({
   iconAnchor:   [5, 5],
   popupAnchor:  [0, -150]
 });
+
 
 
 function pointToLayer(feature, latlng, attrs){
@@ -121,7 +162,7 @@ function pointToLayer(feature, latlng, attrs){
   }).addTo(map);
 };*/
 function createPeakSymbols(data, map, attrs) {
-  trailheads = L.geoJSON(data, {
+  peaks = L.geoJSON(data, {
     pointToLayer: function (feature, latlng) {
       options = {icon: peakIcon};
       return pointToLayer(feature, latlng, attrs);
@@ -141,19 +182,34 @@ function createPeakSymbols(data, map, attrs) {
       
       // Peak Label
       var popupContent = 
-        "<p><b>" + peakRange + "</b><br>" +
-        "<b>" + peakRank + ".</b> " + peakLabel + "</p>" +
+        "<p><b>" + peakRank + ".</b> " + peakLabel + "<br>" +
+        "<b>" + peakRange + "</b><br></p>" +
         "<p><b>Average difficulty:</b> " + peakDifficulty + " out of 5<br>" +
-        "<b># of routes:</b> " + peakRoutes + "<br>" +
+        "<b># of Routes:</b> " + peakRoutes + "<br>" +
         "<b>Elevation:</b> " + peakElevation.toLocaleString() + "' <br>" +
         "<b>Visitors:</b> " + peakPopularity.toLocaleString() + " per year <br>" +
         "<b>Isolation:</b> " + peakIsolation.toFixed(2) + " miles <br>" +
         "<b>Prominence:</b> " + peakProminence.toLocaleString() + "'</p>"
       ;
+      var label = "<p><b>" + peakName + "</b>"
         
       layer.bindPopup(popupContent);
+//      layer.bindTooltip(label, {interactive: "false"});
+      
+      map.on("zoomend", function() {
+        if (map.getZoom() < 10) {
+          layer.bindTooltip(label);
+        }
+        else {
+          layer.unbindTooltip(label);
+        }
+      });
+      
     }
-  }).addTo(map);
+  })/*.addTo(map)*/;
+  
+//  layers.addLayer(peaks);
+  markerClusters.addLayer(peaks);
 }
 // Create trailhead symbol
 function createTrailheadSymbols(data, map, attrs) {
@@ -175,14 +231,25 @@ function createTrailheadSymbols(data, map, attrs) {
       var popupContent = 
         "<p><b>" + trailheadLabel + "</b><br>" +
         "<b>" + "Road Difficulty" + ":</b> " + trailheadDiff + " out of 6</p>" +
-//        "<p><b>Elevation</b> " + trailheadElev + "'<br>" +
         "<b>Range:</b> " + trailheadRange + "<br>" +
         "<b>Peak(s):</b> " + trailheadPeaks + "</p>"
       ; 
         
       layer.bindPopup(popupContent);
     }
-  }).addTo(map);
+  })/*.addTo(map)*/;
+  
+  map.on("zoomend", function() {
+    if (map.getZoom() < 10) {
+      markerClusters.removeLayer(trailheads);
+    }
+    else {
+      markerClusters.addLayer(trailheads);
+    }
+  });
+  
+//  layers.addLayer(trailheads);
+//  markerClusters.addLayer(trailheads);
 }
 // Create route symbol
 function createLineSymbols(data, map, attrs) {
@@ -218,6 +285,57 @@ function createLineSymbols(data, map, attrs) {
         "<b>Exposure:</b> " + routeExposure + "<br>" +
         "<b>Peak(s):</b> " + routePeaks + "</p>"
       ;
+      
+      layer.bindTooltip(popupContent, {sticky: "false", opacity: "0.8"});
+    }
+  })/*.addTo(map)*/;
+  
+  map.on("zoomend", function() {
+    if (map.getZoom() < 10) {
+      markerClusters.removeLayer(routes);
+    }
+    else {
+      markerClusters.addLayer(routes);
+    }
+  });
+  
+//  layers.addLayer(routes);
+//  markerClusters.addLayer(routes);
+}
+// Create range symbol
+function createPolySymbols(data, map, attrs) {
+  ranges = L.geoJSON(data, {
+    style: {
+      color: "#2166AC",
+      opacity: 0.5,
+      weight: 5
+    },
+    
+    onEachFeature: function(feature, layer) {
+      /*layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight
+      })*/
+      
+      // Range Variables
+      /*var routeName = feature.properties["Name"];
+      var routeClass = feature.properties["Class"];
+      var routeClass2 = feature.properties["Qualifier"];
+      var routeLabel = feature.properties["Label"];
+      var routeElevGain = feature.properties["ElevGain"];
+      var routeDistRT = feature.properties["DistRT"];
+      var routeExposure = feature.properties["Exposure"];
+      var routePeaks = feature.properties["Peaks"];*/
+      
+      // Range Label
+      var popupContent = 
+        /*"<p><b>" + routeLabel + "</b><br>" +
+        "<b>" + "Class" + ":</b> " + routeClass + routeClass2 + "</p>" +
+        "<p><b>Elevation Gain:</b> " + routeElevGain + "'<br>" +
+        "<b>Distance:</b> " + routeDistRT + " miles RT<br>" +
+        "<b>Exposure:</b> " + routeExposure + "<br>" +
+        "<b>Peak(s):</b> " + routePeaks + "</p>"
+      ;*/
       layer.bindPopup(popupContent);
       
     }
@@ -238,7 +356,7 @@ function processData(data) {
 //  console.log(attrs);
   return attrs;
 };
-// Call GeoJSON data w/ functions
+// Call GeoJSON data with functions
 function getDataSC(map){
   $.ajax("data/peaks.geojson", {
     dataType: "JSON",
@@ -274,7 +392,7 @@ function getDataSC(map){
       // Create array 
       var attrs = processData(response);
       
-//      createLineSymbols(response, map, attrs);
+//      createPolySymbols(response, map, attrs);
     }
   });
 };
@@ -295,80 +413,6 @@ function resetHighlight(e) {
   
   routes.resetStyle(layer);
 }
-
-
-// Mountain Range Filter
-/*function filterRange(map, attr) {
-  $(".filter-UI a").on("click", function() {
-    // Get filter attribute values
-    var filter = $(this).data("filter");
-    $(this).addClass("active").siblings().removeClass("active");
-    markers.setFilter(function(f) {
-      return (filter === "all") ? true: f.properties[filter] === true;
-    });
-    return false;
-  });
-}*/
-
-//// Filter
-// Filter by range
-// Create Group Layers & Filter Function
-/*var groupLayers = [];
-L.geoJSON(data, {onEachFeatLayer: onEachFeatLayer}).addTo(map);
-function onEachFeatLayer(feat, featLayer) {
-  var rangeGL = groupLayers[feat.properties["range"]];
-  if (rangeGL === undefined) {
-    rangeGL = new L.layerGroup();
-    rangeGL.addTo(map);
-    groupLayers[feat.properties["range"]] = rangeGL;
-  }
-  rangeGL.addLayer(featLayer);
-}
-showLayer("Front Range");
-function showLayer(id) {
-  var rangeGL = groupLayers[id];
-  map.addLayer(rangeGL);   
-}
-function hideLayer(id) {
-  var rangeGL = groupLayers[id];
-  map.removeLayer(rangeGL);   
-}
-*/
-/*
-// Create Filter
-function createFilter(data, map) {
-  // Define range attribute
-  var attr = "forecast";
-  // 
-  L.geoJSON(data, {
-    filter: function(feature, layer) {
-      return feature.properties[attr];
-    }
-  }).addTo(map);
-};
-// Call Filter
-function getDataFilter(map){
-  $.ajax("data/peaks_weather.geojson", {
-    dataType: "json",
-    success: function(response){
-      createFilter(response, map);
-    }
-  });
-};
-*/
-
-//// Legend
-/*
-function createLegend(feature, map) {
-  var temps = [10, 20, 30, 40, 50, 55];
-  for (var i = 0; i < temps.length; i++) {
-    $("#panel").append(
-      "<p><b>Peak:</b> " + feature.properties["name"] + "</p>";
-      //"<p>" + getColor(temps[i] + 1) + feature.properties["rank"] + "</p>";
-    );
-  }
-};
-*/
 
 
 $(document).ready(createMap);
