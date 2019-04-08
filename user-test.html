@@ -14,10 +14,14 @@
     <!--JS-->
     <script type="text/javascript" src="lib/leaflet.js"></script>
     <!--CSS-->
+    <!--<link rel="stylesheet" href="css/style.css">-->
     <link rel="stylesheet" href="css/leaflet.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
     <link rel="stylesheet" href="lib/leaflet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css">
+    <!--<script rel="stylesheet" src="lib/MarkerCluster.css"></script>-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css">
+    <!--<script rel="stylesheet" src="lib/MarkerCluster.Default.css"></script>-->
   </HEAD>
   <BODY>
       <div id="map"></div>
@@ -72,13 +76,19 @@
       </section>
     
     <footer class="footer">
-      <p align="center">
-        <button class="classRank_open">Class Ranking</button>
-        <button class="exposureRank_open">Exposure Ranking</button>
-        <button class="roadDifficulty_open">Road Difficulty</button>
-        <button class="prominenceInfo_open">Prominence Info</button>
-        <button class="isolationInfo_open">Isolation Info</button>
-      </p>
+      <!--<div class="container">
+        <span class="text-muted">
+          <div id="page">-->
+            <p align="center">
+              <button class="classRank_open">Class Ranking</button>
+              <button class="exposureRank_open">Exposure Ranking</button>
+              <button class="roadDifficulty_open">Road Difficulty</button>
+              <button class="prominenceInfo_open">Prominence Info</button>
+              <button class="isolationInfo_open">Isolation Info</button>
+            </p>
+          <!--</div>
+        </span>
+      </div>-->
     </footer>
     
     
@@ -86,28 +96,44 @@
     <script type="text/javascript" src="lib/bootstrap.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/vast-engineering/jquery-popup-overlay@2/jquery.popupoverlay.min.js"></script>
     <script> 
+      //https://dev.vast.com/jquery-popup-overlay/
+      //http://demos.jquerymobile.com/1.4.5/popup/
+      //https://codepen.io/mmsmdali/pen/KqjNPN
       $("#classRank").popup({
+        blur: true,
         pagecontainer: "#page",
-        escape: true
+        escape: true,
+        closebutton: true
       });
       $("#exposureRank").popup({
+        blur: true,
         pagecontainer: "#page",
-        escape: true
+        escape: true,
+        closebutton: true
       });
       $("#roadDifficulty").popup({
+        blur: true,
         pagecontainer: "#page",
-        escape: true
+        escape: true,
+        closebutton: true
       });
       $("#prominenceInfo").popup({
+        blur: true,
         pagecontainer: "#page",
-        escape: true
+        escape: true,
+        closebutton: true
       });
       $("#isolationInfo").popup({
+        blur: true,
         pagecontainer: "#page",
-        escape: true
+        escape: true,
+        closebutton: true
       });
     </script>
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>-->
     <script type="text/javascript" src="lib/leaflet.markercluster.js"></script>
+    <!--<script src="https://unpkg.com/leaflet.featuregroup.subgroup@1.0.2/dist/leaflet.featuregroup.subgroup.js"></script>-->
+    <!--<script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>-->
     <script type="text/javascript" src="js/geojson.js"></script>
   </BODY>
 </HTML>
