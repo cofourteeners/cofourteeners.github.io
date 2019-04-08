@@ -14,10 +14,6 @@ function createMap() {
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       attribution: "ESRI"
   });
-  /*var weather = L.tileLayer.wms(
-    "https://tile.openweathermap.org/map/{precipitation_new}/{7}/{39}/{-106}.png?appid={e459bbdf337bbb0f3009fd77f3a2ab6a}", {
-      attribution: "OWM"
-  });*/
   var weather = L.tileLayer.wms(
     "http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", {
       layers: "nexrad-n0r-900913",
@@ -26,30 +22,18 @@ function createMap() {
       opacity: 0.7,
       attribution: "IEM Nexrad"
   });
-  /*var weather = L.tileLayer.wms(
-    "https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WMSServer", {
-      layers: "1",
-      format: "image/png",
-      transparent: true,
-      opacity: 0.8,
-      attribution: "nowCOAST"
-  });*/
-  
   
   // Add group layers
   layers = L.layerGroup();
   
   // Define map
   var map = L.map("map", {
-    center: [39, -106],
+    center: [39, -106], //[39, -96],
     zoomDelta: 0.25,
     zoomSnap: 0.25,
-    zoom: 7,
-    layers: [basemap, layers, weather]
+    zoom: 7, //5,
+    layers: [basemap, weather]
   });
-  map.createPane("labels");
-  map.getPane("labels").style.zIndex = 650;
-  map.getPane("labels").style.pointerEvents = "none";
   
   // Set up controls
   var baseMaps = {
@@ -58,7 +42,6 @@ function createMap() {
     "Imagery": imagery
   };
   var overlayMaps = {
-    "Layers": layers,
     "Weather": weather
   };
   L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -153,14 +136,6 @@ function pointToLayer(feature, latlng, attrs){
 };
 
 // Create peak symbols
-/*function createPeakSymbols(data, map, attrs) {
-  L.geoJSON(data, {
-    pointToLayer: function(feature, latlng) {
-      options = {icon: peakIcon};
-      return pointToLayer(feature, latlng, attrs);
-    }
-  }).addTo(map);
-};*/
 function createPeakSymbols(data, map, attrs) {
   peaks = L.geoJSON(data, {
     pointToLayer: function (feature, latlng) {
@@ -194,7 +169,6 @@ function createPeakSymbols(data, map, attrs) {
       var label = "<p><b>" + peakName + "</b>"
         
       layer.bindPopup(popupContent);
-//      layer.bindTooltip(label, {interactive: "false"});
       
       map.on("zoomend", function() {
         if (map.getZoom() < 10) {
@@ -208,7 +182,6 @@ function createPeakSymbols(data, map, attrs) {
     }
   })/*.addTo(map)*/;
   
-//  layers.addLayer(peaks);
   markerClusters.addLayer(peaks);
 }
 // Create trailhead symbol
@@ -247,9 +220,6 @@ function createTrailheadSymbols(data, map, attrs) {
       markerClusters.addLayer(trailheads);
     }
   });
-  
-//  layers.addLayer(trailheads);
-//  markerClusters.addLayer(trailheads);
 }
 // Create route symbol
 function createLineSymbols(data, map, attrs) {
@@ -262,7 +232,7 @@ function createLineSymbols(data, map, attrs) {
     
     onEachFeature: function(feature, layer) {
       layer.on({
-        mouseover: highlightFeature,
+        mouseover: highlightFeature, 
         mouseout: resetHighlight
       })
       
@@ -298,9 +268,11 @@ function createLineSymbols(data, map, attrs) {
       markerClusters.addLayer(routes);
     }
   });
-  
-//  layers.addLayer(routes);
-//  markerClusters.addLayer(routes);
+}
+function createLineSymbols2(data, map, attrs) {
+  var line = turf.lineString(data.toGeoJSON);
+  var curved = turf.bezierSpline(line);
+  curved.addTo(map);
 }
 // Create range symbol
 function createPolySymbols(data, map, attrs) {
@@ -311,31 +283,14 @@ function createPolySymbols(data, map, attrs) {
       weight: 5
     },
     
-    onEachFeature: function(feature, layer) {
-      /*layer.on({
-        mouseover: highlightFeature,
-        mouseout: resetHighlight
-      })*/
-      
+    onEachFeature: function(feature, layer) {      
       // Range Variables
-      /*var routeName = feature.properties["Name"];
-      var routeClass = feature.properties["Class"];
-      var routeClass2 = feature.properties["Qualifier"];
-      var routeLabel = feature.properties["Label"];
-      var routeElevGain = feature.properties["ElevGain"];
-      var routeDistRT = feature.properties["DistRT"];
-      var routeExposure = feature.properties["Exposure"];
-      var routePeaks = feature.properties["Peaks"];*/
+      var rangeName = feature.properties["FolderPath"];
       
       // Range Label
       var popupContent = 
-        /*"<p><b>" + routeLabel + "</b><br>" +
-        "<b>" + "Class" + ":</b> " + routeClass + routeClass2 + "</p>" +
-        "<p><b>Elevation Gain:</b> " + routeElevGain + "'<br>" +
-        "<b>Distance:</b> " + routeDistRT + " miles RT<br>" +
-        "<b>Exposure:</b> " + routeExposure + "<br>" +
-        "<b>Peak(s):</b> " + routePeaks + "</p>"
-      ;*/
+        "<p><b>" + rangeName + "</b><p>"
+      ;
       layer.bindPopup(popupContent);
       
     }
@@ -365,7 +320,6 @@ function getDataSC(map){
       var attrs = processData(response);
       
       createPeakSymbols(response, map, attrs);
-//      filterRange(map, attrs);
     }
   });
   $.ajax("data/trailheads.geojson", {
@@ -384,15 +338,6 @@ function getDataSC(map){
       var attrs = processData(response);
       
       createLineSymbols(response, map, attrs);
-    }
-  });
-  $.ajax("data/ranges.geojson", {
-    dataType: "JSON",
-    success: function(response){
-      // Create array 
-      var attrs = processData(response);
-      
-//      createPolySymbols(response, map, attrs);
     }
   });
 };
@@ -414,5 +359,16 @@ function resetHighlight(e) {
   routes.resetStyle(layer);
 }
 
+function highlightFeatures(e) {
+  var layer = e.target;
+  var point = e.latlng;
+  
+  map.eachLayer(function(layer) {
+    var bounds = layer.getBounds();
+    if(bounds.contains(point)) {
+       highlite(layer);
+    }
+  })
+}
 
 $(document).ready(createMap);
