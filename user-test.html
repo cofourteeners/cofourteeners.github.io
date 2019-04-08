@@ -20,11 +20,94 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css">
   </HEAD>
   <BODY>
-    <div id="map"></div>
+      <div id="map"></div>
+      
+      <section id="classRank">
+        <h2 align="center">Class</h2>
+        <p>
+          1 - Easy hiking <br>
+          2 - Moderate hiking <br>
+          3 - Un-roped climbing <br>
+          4 - Roped climbing <br>
+          5 - Technical climbing
+        </p>
+      </section>
+      <section id="exposureRank">
+        <h2 align="center">Exposure</h2>
+        <p>
+          1 - None; gentle terrain nearby <br>
+          2 - Mild exposure nearby, none along route <br>
+          3 - Mild exposure close to route; limited route options <br>
+          4 - Moderate exposure along route; scrambling may be required <br>
+          5 - Serious exposure; short technical moves required <br>
+          6 - Dangerous exposure; steep drops and careful technical moves required <br>
+          7 - Dangerous exposure; vertical cliffs with roped, technical climbing required 
+        </p>
+      </section>
+      <section id="roadDifficulty">
+        <h2 align="center">Road Difficulty</h2>
+        <p>
+          1 - 2WD; paved road <br>
+          2 - 2WD; easy dirt road <br>
+          3 - 2WD; rough dirt road <br>
+          4 - 4WD; good clearance recommended <br>
+          5 - 4WD; good clearance required, short wheel-based recommended <br>
+          6 - 4WD; high clearance required, short wheel-based required <br>
+          7 - 4WD; modified 4WD vehicle required
+        </p>
+      </section>
+      <section id="prominenceInfo">
+        <h2 align="center">Prominence</h2>
+        <p>
+          Defined as the height above the lowest contour not shared by a taller peak <br>
+          Defined as the minimum elevation requried to descend from one summit to another that is taller <br>
+          Calculated by its height and location relative to surrounding peaks 
+        </p>
+      </section>
+      <section id="isolationInfo">
+        <h2 align="center">Isolation</h2>
+        <p>
+          Defined as distance to nearest point of equal elevation
+        </p>
+      </section>
+    
+    <footer class="footer">
+      <p align="center">
+        <button class="classRank_open">Class Ranking</button>
+        <button class="exposureRank_open">Exposure Ranking</button>
+        <button class="roadDifficulty_open">Road Difficulty</button>
+        <button class="prominenceInfo_open">Prominence Info</button>
+        <button class="isolationInfo_open">Isolation Info</button>
+      </p>
+    </footer>
+    
     
     <script type="text/javascript" src="lib/jquery-3.3.1.js"></script>
     <script type="text/javascript" src="lib/bootstrap.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/vast-engineering/jquery-popup-overlay@2/jquery.popupoverlay.min.js"></script>
+    <script> 
+      $("#classRank").popup({
+        pagecontainer: "#page",
+        escape: true
+      });
+      $("#exposureRank").popup({
+        pagecontainer: "#page",
+        escape: true
+      });
+      $("#roadDifficulty").popup({
+        pagecontainer: "#page",
+        escape: true
+      });
+      $("#prominenceInfo").popup({
+        pagecontainer: "#page",
+        escape: true
+      });
+      $("#isolationInfo").popup({
+        pagecontainer: "#page",
+        escape: true
+      });
+    </script>
+    <script type="text/javascript" src="lib/leaflet.markercluster.js"></script>
     <script type="text/javascript" src="js/geojson.js"></script>
   </BODY>
 </HTML>
