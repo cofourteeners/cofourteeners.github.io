@@ -54,25 +54,11 @@ function createMap() {
     removeOutsideVisibleBounds: true,
     spiderfyOnMaxZoom: false
   });
-  markerClusters2 = L.markerClusterGroup({
-    disableClusteringAtZoom: 10,
-    maxClusterRadius: 70,
-    showCoverageOnHover: false,
-    spiderfyOnMaxZoom: false,
-    zoomToBoundsOnClick: false
-  });
-  
-//  markerSubGroup = L.featureGroup.subGroup(markerClusters, layers);
   
   map.addLayer(markerClusters);
-//  map.addLayer(markerSubGroup); 
 
   // Call data on map
   getDataSC(map);
-  //getDataFilter(map);
-  
-  // Add legend to map
-  //legend.addTo(map);
 
 };
 
