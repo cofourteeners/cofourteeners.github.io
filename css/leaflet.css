@@ -29,6 +29,20 @@ html, body, #container {
 }
 
 
+section > p {
+  font-size: 12pt;
+}
+button {
+  background-color: #626262;
+  border: none;
+  color: #FFF;
+  display: inline-block;
+  font-size: 16px;
+  padding: 10px 10px;
+  text-align: center;
+}
+
+
 .container {
   width: auto;
   max-width: 680px;
