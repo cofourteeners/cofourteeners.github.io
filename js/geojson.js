@@ -23,6 +23,7 @@ function createMap() {
       attribution: "IEM Nexrad"
   });
   
+  
   // Add group layers
   layers = L.layerGroup();
   
@@ -32,7 +33,7 @@ function createMap() {
     zoomDelta: 0.25,
     zoomSnap: 0.25,
     zoom: 7, //5,
-    layers: [basemap, weather]
+    layers: [terrain, weather]
   });
   
   // Set up controls
@@ -157,7 +158,7 @@ function createPeakSymbols(data, map, attrs) {
       
       // Peak Label
       var popupContent = 
-        "<p><b>" + peakRank + ".</b> " + peakLabel + "<br>" +
+        "<p><b>" + peakRank + ".</b> " + peakName + "<br>" +
         "<b>" + peakRange + "</b><br></p>" +
         "<p><b>Average difficulty:</b> " + peakDifficulty + " out of 5<br>" +
         "<b># of Routes:</b> " + peakRoutes + "<br>" +
@@ -166,12 +167,13 @@ function createPeakSymbols(data, map, attrs) {
         "<b>Isolation:</b> " + peakIsolation.toFixed(2) + " miles <br>" +
         "<b>Prominence:</b> " + peakProminence.toLocaleString() + "'</p>"
       ;
-      var label = "<p><b>" + peakName + "</b>"
+      var label = "<b>" + peakLabel + "</b>"
+      ;
         
       layer.bindPopup(popupContent);
       
       map.on("zoomend", function() {
-        if (map.getZoom() < 10) {
+        if (map.getZoom() < 12) {
           layer.bindTooltip(label);
         }
         else {
@@ -301,14 +303,14 @@ function createPolySymbols(data, map, attrs) {
 function processData(data) {
   var attrs = [];
   var properties = data.features[0].properties;
-//  console.log(properties);
+  //console.log(properties);
   for (var attr in properties){
     if (attr.indexOf("rank") > -1){
       attrs.push(attr);
     };
   };
 
-//  console.log(attrs);
+  //console.log(attrs);
   return attrs;
 };
 // Call GeoJSON data with functions
@@ -342,7 +344,6 @@ function getDataSC(map){
   });
 };
 
-
 // Highlight functions
 function highlightFeature(e) {
   var layer = e.target;
@@ -359,16 +360,5 @@ function resetHighlight(e) {
   routes.resetStyle(layer);
 }
 
-function highlightFeatures(e) {
-  var layer = e.target;
-  var point = e.latlng;
-  
-  map.eachLayer(function(layer) {
-    var bounds = layer.getBounds();
-    if(bounds.contains(point)) {
-       highlite(layer);
-    }
-  })
-}
 
 $(document).ready(createMap);
