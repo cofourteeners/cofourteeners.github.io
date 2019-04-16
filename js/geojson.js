@@ -33,7 +33,7 @@ function createMap() {
     zoomDelta: 0.25,
     zoomSnap: 0.25,
     zoom: 7, //5,
-    layers: [terrain, weather]
+    layers: [terrain]
   });
   
   // Set up controls
